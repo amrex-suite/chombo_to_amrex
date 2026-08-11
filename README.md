@@ -31,6 +31,8 @@ cmake .. \
     -DAMReX_BUILD_SHARED_LIBS=ON \
     -DAMReX_BUILD_TESTS=OFF \
     -DAMReX_BUILD_EXAMPLES=OFF
+cmake --build . -j8
+cmake --install .
 ```
 
 ## Compilation
