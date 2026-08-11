@@ -35,17 +35,14 @@ cmake --build . -j8
 cmake --install .
 ```
 
-## Compilation
-
-Set the path to the HDF5 and AMReX installation in the `Makefile`:
-
 ## 2. Compile the code
+Set the path to the HDF5 and AMReX installation in the `Makefile`:
 ```
 cd chombo_to_amrex
 make -j8
 ```
 
-## Run
+## 3. Run
 ```
 ./main.exe --chombo-hdf5-file=<hdf5-filename> --amrex-plt-file=<plt-filename>
 ```
