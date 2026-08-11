@@ -48,3 +48,10 @@ make -j8
 ./main.exe --chombo-hdf5-file=<hdf5-filename> --amrex-plt-file=<plt-filename>
 ```
 This will read the Chombo-style hdf5 file and output an AMReX-style plt file that can be visualized in VisIt or ParaView.
+
+
+## Examples
+Here are two examples of the AMReX plotfile visualization of Chombo-style HDF5 data. The zero-contour of the SDF is shown.
+![Simple plane](./Images/chombo_amrex_simpleplane.png)
+![Complex plane](./Images/chombo_amrex_simpleplane.png)
+
