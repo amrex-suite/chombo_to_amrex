@@ -26,11 +26,14 @@ cd amrex
 mkdir build
 cd build
 cmake .. \
-    -DCMAKE_INSTALL_PREFIX=$HOME/amrex-install \
+    -DCMAKE_INSTALL_PREFIX=../install \
     -DAMReX_MPI=ON \
     -DAMReX_BUILD_SHARED_LIBS=ON \
     -DAMReX_BUILD_TESTS=OFF \
-    -DAMReX_BUILD_EXAMPLES=OFF
+    -DAMReX_BUILD_EXAMPLES=OFF \
+    -DAMReX_EB=ON \
+    -DAMREX_FORTRAN=ON \
+    -DAMReX_FORTRAN_INTERFACE=ON
 cmake --build . -j8
 cmake --install .
 ```
