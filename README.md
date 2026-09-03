@@ -32,8 +32,9 @@ cmake .. \
     -DAMReX_BUILD_TESTS=OFF \
     -DAMReX_BUILD_EXAMPLES=OFF \
     -DAMReX_EB=ON \
-    -DAMREX_FORTRAN=ON \
-    -DAMReX_FORTRAN_INTERFACE=ON
+    -DAMReX_FORTRAN=ON \
+    -DAMReX_FORTRAN_INTERFACES=ON
+    -DAMReX_FORTRAN_INTERFACES=ON
 cmake --build . -j8
 cmake --install .
 ```
