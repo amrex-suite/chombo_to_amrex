@@ -1,8 +1,13 @@
 # ==============================================================================
 # Paths (Update these to match your system installation paths)
 # ==============================================================================
-AMREX_HOME ?= /home/mahesh/LBNL_Projects/DanMartinLDRDFY27/amrex/install
-HDF5_HOME  ?= /home/mahesh/Libraries/HDF5
+#Dogora
+#AMREX_HOME ?= /home/mahesh/LBNL_Projects/DanMartinLDRDFY27/amrex/install
+#HDF5_HOME  ?= /home/mahesh/Libraries/HDF5
+
+#Perlmutter
+AMREX_HOME ?= /pscratch/sd/n/nataraj2/DanMartinLDRDFY27/amrex/install
+HDF5_HOME  ?= /opt/cray/pe/hdf5-parallel/1.14.3.1/gnu/12.3
 
 # ==============================================================================
 # Compiler & Flags
