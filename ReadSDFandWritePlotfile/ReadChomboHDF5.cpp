@@ -134,22 +134,50 @@ void read_level(
         long long begin = offsets[b];
         long long end   = offsets[b+1];
 
-        long long expected =
-            static_cast<long long>(bx.numPts());
+const int nx = bx.length(0);
+const int ny = bx.length(1);
+const int nz = bx.length(2);
 
-        AMREX_ALWAYS_ASSERT(
-            end - begin == expected);
+const int ng = 1;
 
-        const Real* src =
-            data.data() + begin;
+// Chombo FArrayBox contains ghost cells:
+// (nx + 2*ng) x (ny + 2*ng) x (nz + 2*ng)
+const long long chombo_size =
+    static_cast<long long>(nx + 2*ng) *
+    (ny + 2*ng) *
+    (nz + 2*ng);
 
-        auto& fab = mf[b];
+AMREX_ALWAYS_ASSERT(
+    end - begin == chombo_size);
 
-        Real* dst = fab.dataPtr(0);
+const Real* src =
+    data.data() + begin;
+
+auto& fab = mf[b];
+
+Real* dst = fab.dataPtr(0);
+
+// Copy only the valid 128^3 region.
+for (int k = 0; k < nz; ++k)
+{
+    for (int j = 0; j < ny; ++j)
+    {
+        const Real* src_row =
+            src +
+            (k + ng) * (ny + 2*ng) * (nx + 2*ng) +
+            (j + ng) * (nx + 2*ng) +
+            ng;
+
+        Real* dst_row =
+            dst +
+            k * ny * nx +
+            j * nx;
 
         std::copy(
-            src,
-            src + expected,
-            dst);
+            src_row,
+            src_row + nx,
+            dst_row);
+    }
+}
     }
 }

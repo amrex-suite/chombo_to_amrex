@@ -71,7 +71,27 @@ int main(int argc, char* argv[])
 	// Three AMR levels
 	// --------------------------------------------------------
 
-	const int nlev = 3;
+    int nlev = 0;
+
+    while (true)
+    {
+        std::string level_name =
+            "level_" + std::to_string(nlev);
+
+        htri_t exists = H5Lexists(file, level_name.c_str(), H5P_DEFAULT);
+
+        if (exists <= 0)
+        {
+            break;
+        }
+
+        ++nlev;
+    }
+
+    if (nlev == 0)
+    {   
+        amrex::Abort("No AMR levels found in Chombo HDF5 file");
+    }
 
 	Vector<std::unique_ptr<MultiFab>> mf(nlev);
 	Vector<Geometry> geom(nlev);
