@@ -14,7 +14,7 @@ In the inputs file give the path to the chombo hdf5 file.
 eb2.chombo_sdf_hdf5_file=<path-to=chombo-hdf5-file>
 ```
 
-# Compilation
+## Compilation
 ```
 cd chombo_to_amrex/CNS/Exec/Chombo_AMReX
 make -j8
