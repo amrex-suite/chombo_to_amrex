@@ -13,7 +13,7 @@ HDF5_HOME  ?= /opt/cray/pe/hdf5-parallel/1.14.3.1/gnu/12.3
 # Compiler & Flags
 # ==============================================================================
 # Use mpic++ or C++ compiler matching your AMReX build
-CXX      = mpicxx
+CXX      = CC
 CXXFLAGS ?= -O3 -std=c++20 -Wall
 
 # ==============================================================================
@@ -27,6 +27,8 @@ INCLUDES := -I. \
 # Add library search paths
 LDFLAGS  := -L$(AMREX_HOME)/lib \
             -L$(HDF5_HOME)/lib
+
+LDFLAGS  += -L/opt/cray/pe/lib64 \
 
 # Specify libraries to link against
 # Note: Order matters. Dependent libraries come after.
