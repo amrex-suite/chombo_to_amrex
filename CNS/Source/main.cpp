@@ -1,9 +1,9 @@
-
 #include <AMReX.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_ParallelDescriptor.H>
 #include <AMReX_Amr.H>
 #include <AMReX_EB2.H>
+#include "AMReX_EB2_DistributedGeometryShop.H"
 
 #include <CNS.H>
 #include "ReadChomboHDF5.H"
@@ -13,7 +13,44 @@ using namespace amrex;
 amrex::LevelBld* getLevelBld ();
 void initialize_EB2 (const Geometry& geom, const int required_level, const int max_level);
 
-void read_and_write_plotfile(
+Vector<MultiFab>
+make_ghosted_multifab(
+    const Vector<MultiFab>& mf,
+    int nghost)
+{
+    const int nlevels = mf.size();
+
+    Vector<MultiFab> mf_ghosted(nlevels);
+
+    for (int lev = 0; lev < nlevels; ++lev)
+    {
+        const MultiFab& src = mf[lev];
+
+        mf_ghosted[lev].define(
+            src.boxArray(),
+            src.DistributionMap(),
+            src.nComp(),
+            nghost);
+
+        // Copy the valid cells.
+        MultiFab::Copy(
+            mf_ghosted[lev],
+            src,
+            0,              // srccomp
+            0,              // destcomp
+            src.nComp(),    // number of components
+            0);             // nghost
+
+        // Fill ghost cells from neighboring boxes on this level.
+        mf_ghosted[lev].FillBoundary();
+    }
+
+    return mf_ghosted;
+}
+
+std::pair<amrex::Vector<amrex::MultiFab>,
+          amrex::Vector<amrex::Geometry>>
+read_and_write_plotfile(
     const std::string& input_plotfile,
     const std::string& output_plotfile,
     const std::string& varname)
@@ -44,24 +81,21 @@ void read_and_write_plotfile(
                        << " boxes\n";
     }
 
+    // Geometries.
     amrex::Vector<amrex::Geometry> geom(nlev);
 
-    Array<int,AMREX_SPACEDIM> is_periodic
-    {
-        AMREX_D_DECL(0,0,0)
+    amrex::Array<int, AMREX_SPACEDIM> is_periodic{
+        AMREX_D_DECL(0, 0, 0)
     };
 
     for (int lev = 0; lev < nlev; ++lev)
     {
-        Geometry geom_lev(pf.probDomain(lev),
-                          amrex::RealBox(
-                            pf.probLo(),
-                            pf.probHi()),
-                          pf.coordSys(),
-                          is_periodic
-                         );
-
-        geom[lev] = geom_lev;
+        geom[lev] = amrex::Geometry(
+            pf.probDomain(lev),
+            amrex::RealBox(pf.probLo(), pf.probHi()),
+            pf.coordSys(),
+            is_periodic
+        );
     }
 
     // Refinement ratios.
@@ -105,6 +139,54 @@ void read_and_write_plotfile(
 
     amrex::Print() << "Wrote plotfile: "
                    << output_plotfile << "\n";
+
+    return {std::move(mfs), std::move(geom)};
+}
+
+amrex::Vector<amrex::MultiFab>
+copy_to_amrex_hierarchy(
+    const amrex::Vector<amrex::MultiFab>& vec_mf_chombo,
+    Amr& amr)
+{
+    const int finest_level = amr.finestLevel();
+
+    if (static_cast<int>(vec_mf_chombo.size()) < finest_level + 1) {
+        amrex::Abort(
+            "vec_mf_chombo does not contain enough levels for the AMReX hierarchy");
+    }
+
+    amrex::Vector<amrex::MultiFab> vec_mf_amrex(finest_level + 1);
+
+    for (int lev = 0; lev <= finest_level; ++lev)
+    {
+        // AMReX-created hierarchy at this level.
+        AmrLevel& level = amr.getLevel(lev);
+
+        const amrex::BoxArray& ba = level.boxArray();
+        const amrex::DistributionMapping& dm = level.DistributionMap();
+
+        const amrex::MultiFab& src = vec_mf_chombo[lev];
+
+        // Create destination MultiFab on AMReX's BoxArray and
+        // DistributionMapping. No ghost cells for now.
+        vec_mf_amrex[lev].define(
+            ba,
+            dm,
+            src.nComp(),
+            0
+        );
+
+        // Copy valid data from the source layout to the
+        // AMReX-created layout.
+        vec_mf_amrex[lev].ParallelCopy(src);
+
+        amrex::Print() << "Copied level " << lev
+                       << ": "
+                       << src.boxArray().size() << " source boxes -> "
+                       << ba.size() << " AMReX boxes\n";
+    }
+
+    return vec_mf_amrex;
 }
 
 int main (int argc, char* argv[])
@@ -141,12 +223,8 @@ int main (int argc, char* argv[])
         amrex::Abort("Exiting because neither max_step nor stop_time is non-negative.");
     }
 
-
-           read_and_write_plotfile(
-            "plt_sphere",
-            "plt_sphere_test",
-            "SDF"
-        );
+     // 1. Read SDF and Geometries from plotfile
+    auto [vec_mf_chombo, vec_geom_chombo] = read_and_write_plotfile("plt_sphere_1lev", "plt_sphere_test", "SDF");
 
     {
         timer_init = amrex::second();
@@ -155,7 +233,32 @@ int main (int argc, char* argv[])
         AmrLevel::SetEBSupportLevel(EBSupport::full);
         AmrLevel::SetEBMaxGrowCells(CNS::numGrow(),4,2);
 
-        initialize_EB2(amr.Geom(amr.maxLevel()), amr.maxLevel(), amr.maxLevel());
+        // vec_mf_chombo has already been read from the plotfile
+        // and has no ghost cells.
+        auto vec_mf_amrex = copy_to_amrex_hierarchy(vec_mf_chombo, amr);
+
+        // Make a version of the sdf vector<multifab> with 1 ghost cell for 3d-interpolation to work
+        auto mf_ghosted = make_ghosted_multifab(vec_mf_amrex, 1);
+
+        // 1. Convert Vector<MultiFab> to Vector<std::shared_ptr<MultiFab>>
+
+        amrex::Vector<amrex::MultiFab> mf_ptrs;
+
+        for (auto& mf : mf_ghosted) {
+            mf_ptrs.push_back(std::move(mf));
+        }
+
+        // 2. Create the Distributed SDF functor
+        // Pass the vector of shared_ptrs
+        amrex::EB2::DistributedSDF sdf_functor(std::move(mf_ptrs), std::move(vec_geom_chombo));
+
+        // 3. Create the specialized shop
+        auto gshop = amrex::EB2::makeDistributedShop(std::move(sdf_functor));
+
+        // 4. Build the EB2 IndexSpace
+        amrex::EB2::Build(gshop, amr.Geom(amr.maxLevel()), amr.maxLevel(), amr.maxLevel(), 4);
+
+        //initialize_EB2(amr.Geom(amr.maxLevel()), amr.maxLevel(), amr.maxLevel());
 
         amr.init(strt_time,stop_time);
 
