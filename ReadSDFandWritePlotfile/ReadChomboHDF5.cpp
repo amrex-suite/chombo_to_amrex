@@ -138,7 +138,7 @@ const int nx = bx.length(0);
 const int ny = bx.length(1);
 const int nz = bx.length(2);
 
-const int ng = 1;
+const int ng = 0;
 
 // Chombo FArrayBox contains ghost cells:
 // (nx + 2*ng) x (ny + 2*ng) x (nz + 2*ng)
