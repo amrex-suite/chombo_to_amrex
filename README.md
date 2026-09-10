@@ -6,7 +6,7 @@ See [README](https://github.com/amrex-suite/chombo_to_amrex/tree/main/CNS/Exec/C
 
 
 ## Examples
-Here are two examples of the AMReX plotfile visualization of Chombo-style HDF5 data. The zero-contour of the SDF is shown.
+Here are a few examples of the AMReX EB visualization of Chombo SDF data. The zero-contour are shown.
 
 <img src="Images/chombo_amrex_torus.png" alt="Torus" width="700">
 
