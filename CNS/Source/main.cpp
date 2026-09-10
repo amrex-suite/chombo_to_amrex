@@ -64,11 +64,11 @@ int main (int argc, char* argv[])
         auto [vec_mf_chombo, vec_geom_chombo] = read_chombo_hdf5_and_plot(chombo_sdf_hdf5_file);
 
         // Make a version of the sdf vector<multifab> with 1 ghost cell for 3d-interpolation to work
-        auto mf_ghosted = make_ghosted_multifab(vec_mf_chombo, 1);
+        auto vec_mf_chombo_ghosted = make_ghosted_multifab(vec_mf_chombo, 1);
 
         // 2. Create the Distributed SDF functor
         // Pass the vector of shared_ptrs
-        amrex::EB2::DistributedSDF sdf_functor(mf_ghosted, std::move(vec_geom_chombo));
+        amrex::EB2::DistributedSDF sdf_functor(vec_mf_chombo_ghosted, std::move(vec_geom_chombo));
 
         // 3. Create the specialized shop
         auto gshop = amrex::EB2::makeDistributedShop(std::move(sdf_functor));
