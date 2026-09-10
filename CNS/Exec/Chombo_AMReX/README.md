@@ -16,7 +16,7 @@ In the inputs file give the path to the chombo hdf5 file.
 ```
 eb2.chombo_sdf_hdf5_file=<path-to=chombo-hdf5-file>
 ```
-Run the flow solver
+Run the flow solver. Currently, only serial run is supported.
 ```
 ./CNS3d.gnu.x86-milan.MPI.ex inputs_simple_plane
 ```
