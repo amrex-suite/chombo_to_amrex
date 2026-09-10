@@ -20,3 +20,10 @@ Run the flow solver. Currently, only serial run is supported.
 ```
 ./CNS3d.gnu.x86-milan.MPI.ex inputs_simple_plane
 ```
+
+## Visualization
+
+The Chombo SDF is written into a plot file named `plt_<basename_of_hdf5>`, for eg., `plt_torus.3d`. 
+These files have just 1 field written into them.
+The AMReX plot files are named as plt00\*. These have several fields. The `vfrac` variable has the volume 
+fraction field.
