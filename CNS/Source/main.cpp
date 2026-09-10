@@ -65,7 +65,6 @@ int main (int argc, char* argv[])
         auto vec_mf_chombo_ghosted = make_ghosted_multifab(vec_mf_chombo, 1);
 
         // 2. Create the Distributed SDF functor
-        // Pass the vector of shared_ptrs
         amrex::EB2::DistributedSDF sdf_functor(vec_mf_chombo_ghosted, std::move(vec_geom_chombo));
 
         // 3. Create the specialized shop
