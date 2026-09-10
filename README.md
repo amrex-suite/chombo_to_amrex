@@ -9,11 +9,11 @@ See [README](https://github.com/amrex-suite/chombo_to_amrex/tree/main/CNS/Exec/C
 Here are two examples of the AMReX plotfile visualization of Chombo-style HDF5 data. The zero-contour of the SDF is shown.
 
 ### Torus
-<img src="Images/chombo_amrex_torus.png" alt="Simple plane" width="500">
+<img src="Images/chombo_amrex_torus.png" alt="Torus" width="500">
 
 ### Simple plane
-<img src="Images/chombo_amrex_simpleplane.png" alt="Simple plane" width="500">
+<img src="Images/chombo_amrex_simple_plane.png" alt="Simple plane" width="500">
 
 ### Complex plane
-<img src="Images/chombo_amrex_complexplane.png" alt="Complex plane" width="50%">
+<img src="Images/chombo_amrex_complex_plane.png" alt="Complex plane" width="50%">
 
