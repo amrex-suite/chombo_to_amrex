@@ -1,0 +1,4 @@
+[submodule "external/amrex"]
+	path = external/amrex
+	url = https://github.com/nataraj2/amrex.git
+	branch = chombo_SDF_to_amrex_EB2
