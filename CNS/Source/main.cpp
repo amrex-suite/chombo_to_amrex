@@ -76,8 +76,6 @@ int main (int argc, char* argv[])
         // 4. Build the EB2 IndexSpace
         amrex::EB2::Build(gshop, amr.Geom(amr.maxLevel()), amr.maxLevel(), amr.maxLevel(), 4, false);
 
-        //exit(1);
-
         //initialize_EB2(amr.Geom(amr.maxLevel()), amr.maxLevel(), amr.maxLevel());
 
         amr.init(strt_time,stop_time);
