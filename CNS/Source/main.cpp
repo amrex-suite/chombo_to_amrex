@@ -58,9 +58,7 @@ int main (int argc, char* argv[])
         AmrLevel::SetEBSupportLevel(EBSupport::full);
         AmrLevel::SetEBMaxGrowCells(CNS::numGrow(),4,2);
 
-       // 1. Read SDF and Geometries from plotfile
-        //auto [vec_mf_chombo, vec_geom_chombo] = read_and_write_plotfile("plt_sphere_1lev", "plt_sphere_test", "SDF");
-
+        // Read the Chombo signed distance function HDF5 file 
         auto [vec_mf_chombo, vec_geom_chombo] = read_chombo_hdf5_and_plot(chombo_sdf_hdf5_file);
 
         // Make a version of the sdf vector<multifab> with 1 ghost cell for 3d-interpolation to work
