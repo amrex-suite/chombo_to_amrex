@@ -14,3 +14,10 @@ Here are a few examples of the AMReX EB visualization of Chombo SDF data. The ze
 
 <img src="Images/chombo_amrex_complex_plane.png" alt="Complex plane" width="700">
 
+<table>
+  <tr>
+    <td align="center"><img src="Images/Torus_View1.gif" width="400"/><br /><sub><b>Torus View 1</b></sub></td>
+    <td align="center"><img src="Images/Torus_View2.gif" width="400"/><br /><sub><b>Torus View 2</b></sub></td>
+  </tr>
+</table>
+
