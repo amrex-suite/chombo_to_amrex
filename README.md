@@ -17,6 +17,7 @@ Here are a few examples of the AMReX EB visualization of Chombo SDF data. The ze
 ## Flow solver
 
 ### Flow past a Torus generated from Chombo SDF in AMReX
+A 100 m/s flow in the x-direction past the Torus (isocontour shown in black)
 
 <table>
   <tr>
